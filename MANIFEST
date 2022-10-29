@@ -1,0 +1,3 @@
+REPO superset
+LOAD superset.yml stack.yml
+RESOURCES files/init.sh files/frontend.sh files/bootstrap.sh files/config.py

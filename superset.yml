@@ -1,0 +1,244 @@
+namespace: monk-superset
+
+superset-common:
+  variables:
+    monk-project-name:
+      env: COMPOSE_PROJECT_NAME
+      type: string
+      value: <- `${project_name}`
+    config_path:
+      env: SUPERSET_CONFIG
+      type: string
+      value: superset_config
+    python_path:
+      env: PYTHONPATH
+      type: string
+      value: /app/config
+    monk-db-dialect:
+      env: DATABASE_DIALECT
+      type: string
+      value: postgresql
+    monk-db-host:
+      env: DATABASE_HOST
+      type: string
+      value: <- get-hostname("monk-superset/db", "postgres") split(".dns.podman") join("")
+    monk-db-port:
+      env: DATABASE_PORT
+      type: string
+      value: <- `${database_port}`
+    db-password:
+      env: DATABASE_PASSWORD
+      value: <- `${database_password}`
+      type: string
+    db-user:
+      env: DATABASE_USER
+      value: <- `${database_user}`
+      type: string
+    db-name:
+      env: DATABASE_DB
+      value: <- `${database_name}`
+      type: string
+    db-port:
+      value: <- `${database_port}`
+      type: int
+    crypress-config:
+      env: CYPRESS_CONFIG
+      type: bool
+      value: false
+    superset-examples:
+      env: SUPERSET_LOAD_EXAMPLES
+      type: bool
+      value: true
+    rds_host: 
+      env: REDIS_HOST
+      type: string
+      value: <- get-hostname("monk-superset/rds", "monk-rds") split(".dns.podman") join("")
+    rds_port: 
+      env: REDIS_PORT
+      type: int
+      value: 6379
+    superset-port:
+      env: SUPERSET_PORT
+      type: int
+      value: 8088
+    volume_data:
+      type: string
+      value: <- `${monk-volume-path}/superset`
+
+rds: 
+  defines: runnable
+  variables:
+    image_tag:
+      type: string
+      value: <- `${redis_image_tag}`
+    rds_port:
+      type: int
+      value: <- `${redis_port}`
+    rds_disable_commands:
+      env: REDIS_DISABLE_COMMANDS
+      type: string
+      value: <- `${redis_disable_commands}`
+    rds_empty_password:
+      env: ALLOW_EMPTY_PASSWORD
+      type: string
+      value: <- `${redis_empty_password}`
+    rds_io_thread:
+      env: REDIS_IO_THREADS
+      type: string
+      value: <- `${redis_io_thread}`
+    rds_io_threads_do_reads:
+      env: REDIS_IO_THREADS_DO_READS
+      type: string
+      value: <- `${redis_io_threads_do_reads}`
+    volume_data:
+      type: string
+      value: <- `${monk-volume-path}/redis`
+  containers:
+    monk-rds:
+      paths:
+        - <- `${volume_data}/mysql:/bitnami/redis/data`
+      ports:
+        - <- `0.0.0.0:${rds_port}:6379`
+      image: bitnami/redis
+  version: 1.0
+
+
+db: 
+  defines: runnable
+  variables:
+    defines: variables
+    image-tag:
+      type: string
+      value: latest
+    db-password:
+      env: POSTGRES_PASSWORD
+      value: <- `${database_password}`
+      type: string
+    db-user:
+      env: POSTGRES_USER
+      value: <- `${database_user}`
+      type: string
+    db-name:
+      env: POSTGRES_DB
+      value: <- `${database_name}`
+      type: string
+    db-port:
+      value: <- `${database_port}`
+      type: int
+    db-trust:
+      env: POSTGRES_HOST_AUTH_METHOD
+      value: trust
+  containers:
+    defines: containers
+    postgres:
+      image-tag: <- `${image-tag}`
+      # paths:
+      # - <- `${moncc-volume-path}/db_data:/var/lib/postgresql/data`
+      image: postgres
+      ports:
+      - <- `0.0.0.0:${db-port}:5432`
+
+
+superset-init:
+  defines: runnable
+  inherits: ./superset-common
+  containers:
+    monk-superset:
+      image: apache/superset
+      user: 0
+      bash: /app/files/init.sh
+  files:
+    init:
+      container: monk-superset
+      mode: 0755
+      path: /app/files/init.sh
+      contents: <<< files/init.sh
+    bootstrap:
+      container: monk-superset
+      mode: 0755
+      path: /app/files/bootstrap.sh
+      contents: <<< files/bootstrap.sh
+    config:
+      container: monk-superset
+      mode: 0755
+      path: /app/config/superset_config.py
+      contents: <<< files/config.py
+  depends:
+    wait-for:
+      runnables:
+        - monk-superset/rds
+        - monk-superset/db
+
+superset:
+  defines: runnable
+  inherits: ./superset-common
+  containers:
+    monk-superset:
+      image: apache/superset
+      user: 0
+      bash: /app/files/bootstrap.sh app
+      ports:
+        - <- `0.0.0.0:8088:8088`
+  files:
+    bootstrap:
+      container: monk-superset
+      mode: 0755
+      path: /app/files/bootstrap.sh
+      contents: <<< files/bootstrap.sh
+    config:
+      container: monk-superset
+      mode: 0755
+      path: /app/config/superset_config.py
+      contents: <<< files/config.py
+  depends:
+    wait-for:
+      runnables:
+        - monk-superset/superset-init
+
+superset-beat:
+  defines: runnable
+  inherits: ./superset-common
+  containers:
+    monk-superset:
+      image: apache/superset
+      user: 0
+      bash: /app/files/bootstrap.sh beat
+  files:
+    bootstrap:
+      container: monk-superset
+      mode: 0755
+      path: /app/files/bootstrap.sh
+      contents: <<< files/bootstrap.sh
+    config:
+      container: monk-superset
+      mode: 0755
+      path: /app/config/superset_config.py
+      contents: <<< files/config.py
+  depends:
+    wait-for:
+      runnables:
+        - monk-superset/superset-init
+
+superset-worker:
+  defines: runnable
+  inherits: ./superset-common
+  containers:
+    monk-superset:
+      image: apache/superset
+      user: 0
+      bash: /app/files/bootstrap.sh worker
+  files:
+    bootstrap:
+      container: monk-superset
+      mode: 0755
+      path: /app/files/bootstrap.sh
+      contents: <<< files/bootstrap.sh
+    config:
+      container: monk-superset
+      mode: 0755
+      path: /app/config/superset_config.py
+      contents: <<< files/config.py
+  depends:
+    wait-for:
+      runnables:
+        - monk-superset/superset-init

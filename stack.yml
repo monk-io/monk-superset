@@ -1,0 +1,44 @@
+namespace: monk-superset
+
+stack:
+  defines: process-group
+  runnable-list:
+    - monk-superset/db
+    - monk-superset/rds
+    - monk-superset/superset-init
+    - monk-superset/superset
+    - monk-superset/superset-beat
+    - monk-superset/superset-worker
+
+  variables:
+    redis_image_tag: "latest"
+    redis_port: 6389
+    redis_disable_commands: FLUSHDB,FLUSHALL,CONFIG 
+    redis_password: 123
+    redis_empty_password: yes
+    redis_io_thread: 1
+    redis_io_threads_do_reads: yes
+    database_name:
+      type: string
+      value: monk
+    database_password:
+      type: string
+      value: monk
+    project_name:
+      type: string
+      value: Monk SuperSet
+    database_user:
+      type: string
+      value: monk
+    database_port:
+      type: int
+      value: 5432
+    growthbook_port1:
+      type: int
+      value: 3100
+    growthbook_port2:
+      type: int
+      value: 3000
+    db_password:
+      type: string
+      value: monk
