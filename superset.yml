@@ -1,6 +1,13 @@
 namespace: monk-superset
 
 superset-common:
+  metadata:
+    defines: metadata
+    name: Superset
+    description: Apache Superset is a modern, enterprise-ready business intelligence web application.
+    website: https://superset.apache.org/
+    publisher: monk.io
+    icon: https://superset.apache.org/img/superset-logo-horiz.svg
   variables:
     monk-project-name:
       env: COMPOSE_PROJECT_NAME

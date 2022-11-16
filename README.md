@@ -17,7 +17,7 @@ not connected to cluster
 
 ## Clone Repository
 ```bash
-git clone https://github.com/Burakhan/monk-superset
+git clone https://github.com/monk-io/monk-superset
 ```
 
 ## Load Template
@@ -97,15 +97,6 @@ foo@bar:~$ monk run monk-superset/stack
 `http://16.170.240.192:8088/`
 
 
-
-## Variables
-The variables are in `stack.yml` file. You can quickly setup by editing the values here.
-
-| Variable                     	| Description                               	|
-|------------------------------	|-------------------------------------------	|
-| vault_port                    | Vault Warden port, Default: 8084 	               |
-| vaultwarden_signup_enabled                    | Signup enable, Default: true 	               |
-| vaultwarden_admin_token                    | admin password, Default: monk 	               |
 
 
 

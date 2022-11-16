@@ -33,12 +33,6 @@ stack:
     database_port:
       type: int
       value: 5432
-    growthbook_port1:
-      type: int
-      value: 3100
-    growthbook_port2:
-      type: int
-      value: 3000
     db_password:
       type: string
       value: monk
