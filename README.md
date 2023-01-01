@@ -1,13 +1,16 @@
 # Apache Superset & Monk
+
 This repository contains Monk.io template to deploy Apache Superset & Monk either locally or on cloud of your choice (AWS, GCP, Azure, Digital Ocean).
 
-# Prerequisites
+## Prerequisites
+
 - [Install Monk](https://docs.monk.io/docs/get-monk)
 - [Register and Login Monk](https://docs.monk.io/docs/acc-and-auth)
 - [Add Cloud Provider](https://docs.monk.io/docs/cloud-provider)
 - [Add Instance](https://docs.monk.io/docs/multi-cloud)
 
-#### Make sure monkd is running.
+### Make sure monkd is running
+
 ```bash
 foo@bar:~$ monk status
 daemon: ready
@@ -16,18 +19,20 @@ not connected to cluster
 ```
 
 ## Clone Repository
+
 ```bash
 git clone https://github.com/monk-io/monk-superset
 ```
 
 ## Load Template
+
 ```bash
 cd monk-superset
 monk load MANIFEST
 ```
 
+### Let's take a look at the themes I have installed
 
-#### Let's take a look at the themes I have installed.
 ```bash
 foo@bar:~$ monk list monk-superset
 ✔ Got the list
@@ -42,6 +47,7 @@ runnable  monk-superset/superset-worker  local       -         -
 ```
 
 ## Deploy Stack
+
 ```bash
 foo@bar:~$ monk run monk-superset/stack
 ?✔ Starting the job: local/monk-superset/stack... DONE
@@ -86,9 +92,9 @@ foo@bar:~$ monk run monk-superset/stack
           └─🧩 apache/superset:latest
 
 💡 You can inspect and manage your above stack with these commands:
-	monk logs (-f) local/monk-superset/stack - Inspect logs
-	monk shell     local/monk-superset/stack - Connect to the container's shell
-	monk do        local/monk-superset/stack/action_name - Run defined action (if exists)
+ monk logs (-f) local/monk-superset/stack - Inspect logs
+ monk shell     local/monk-superset/stack - Connect to the container's shell
+ monk do        local/monk-superset/stack/action_name - Run defined action (if exists)
 💡 Check monk help for more!
 ```
 
@@ -96,14 +102,8 @@ foo@bar:~$ monk run monk-superset/stack
 
 `http://16.170.240.192:8088/`
 
-
-
-
-
-
 ## Stop, remove and clean up workloads and templates
 
 ```bash
-monk purge -x -a
+monk purge monk-superset
 ```
-
