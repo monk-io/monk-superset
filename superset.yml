@@ -1,4 +1,4 @@
-namespace: monk-superset
+namespace: superset
 
 superset-common:
   metadata:
@@ -10,10 +10,10 @@ superset-common:
     icon: https://superset.apache.org/img/superset-logo-horiz.svg
   connections:
     database:
-      runnable: monk-superset/db
+      runnable: superset/db
       service: db-svc
     redis:
-      runnable: monk-superset/rds
+      runnable: superset/rds
       service: rds-svc
   variables:
     monk-project-name:
@@ -169,37 +169,37 @@ superset-init:
   defines: runnable
   inherits: ./superset-common
   containers:
-    monk-superset:
+    superset:
       image: apache/superset
       user: 0
       bash: /app/files/init.sh
   files:
     init:
-      container: monk-superset
+      container: superset
       mode: 0755
       path: /app/files/init.sh
       contents: <<< files/init.sh
     bootstrap:
-      container: monk-superset
+      container: superset
       mode: 0755
       path: /app/files/bootstrap.sh
       contents: <<< files/bootstrap.sh
     config:
-      container: monk-superset
+      container: superset
       mode: 0755
       path: /app/config/superset_config.py
       contents: <<< files/config.py
   depends:
     wait-for:
       runnables:
-        - monk-superset/rds
-        - monk-superset/db
+        - superset/rds
+        - superset/db
 
 superset:
   defines: runnable
-  inherits: monk-superset/superset-common
+  inherits: superset/superset-common
   containers:
-    monk-superset:
+    superset:
       image: apache/superset
       user: 0
       bash: /app/files/bootstrap.sh app
@@ -207,64 +207,64 @@ superset:
         - <- `0.0.0.0:8088:8088`
   files:
     bootstrap:
-      container: monk-superset
+      container: superset
       mode: 0755
       path: /app/files/bootstrap.sh
       contents: <<< files/bootstrap.sh
     config:
-      container: monk-superset
+      container: superset
       mode: 0755
       path: /app/config/superset_config.py
       contents: <<< files/config.py
   depends:
     wait-for:
       runnables:
-        - monk-superset/superset-init
+        - superset/superset-init
 
 superset-beat:
   defines: runnable
-  inherits: monk-superset/superset-common
+  inherits: superset/superset-common
   containers:
-    monk-superset:
+    superset:
       image: apache/superset
       user: 0
       bash: /app/files/bootstrap.sh beat
   files:
     bootstrap:
-      container: monk-superset
+      container: superset
       mode: 0755
       path: /app/files/bootstrap.sh
       contents: <<< files/bootstrap.sh
     config:
-      container: monk-superset
+      container: superset
       mode: 0755
       path: /app/config/superset_config.py
       contents: <<< files/config.py
   depends:
     wait-for:
       runnables:
-        - monk-superset/superset-init
+        - superset/superset-init
 
 superset-worker:
   defines: runnable
-  inherits: monk-superset/superset-common
+  inherits: superset/superset-common
   containers:
-    monk-superset:
+    superset:
       image: apache/superset
       user: 0
       bash: /app/files/bootstrap.sh worker
   files:
     bootstrap:
-      container: monk-superset
+      container: superset
       mode: 0755
       path: /app/files/bootstrap.sh
       contents: <<< files/bootstrap.sh
     config:
-      container: monk-superset
+      container: superset
       mode: 0755
       path: /app/config/superset_config.py
       contents: <<< files/config.py
   depends:
     wait-for:
       runnables:
-        - monk-superset/superset-init
+        - superset/superset-init

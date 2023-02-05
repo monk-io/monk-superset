@@ -1,14 +1,14 @@
-namespace: monk-superset
+namespace: superset
 
 stack:
   defines: process-group
   runnable-list:
-    - monk-superset/db
-    - monk-superset/rds
-    - monk-superset/superset-init
-    - monk-superset/superset
-    - monk-superset/superset-beat
-    - monk-superset/superset-worker
+    - superset/db
+    - superset/rds
+    - superset/superset-init
+    - superset/superset
+    - superset/superset-beat
+    - superset/superset-worker
 
   variables:
     redis_image_tag: "latest"
