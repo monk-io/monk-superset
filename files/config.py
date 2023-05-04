@@ -212,10 +212,10 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 # Your App secret key. Make sure you override it on superset_config.py.
 # Use a strong complex alphanumeric string and use a tool to help you generate
 # a sufficiently random sequence, ex: openssl rand -base64 42"
-SECRET_KEY = CHANGE_ME_SECRET_KEY
+SECRET_KEY = "569Jy9ZD/DfW2yqOSYcrPxB73JuezHR23eytL7uj2hMWvAHdy1GlzQXC"
 
-
-
+SSH_TUNNEL_MANAGER_CLASS = "superset.extensions.ssh.SSHManager"
+SSH_TUNNEL_LOCAL_BIND_ADDRESS = "127.0.0.1"
 
 # The SQLAlchemy connection string.
 SQLALCHEMY_DATABASE_URI = "%s://%s:%s@%s:%s/%s" % (
@@ -226,6 +226,8 @@ SQLALCHEMY_DATABASE_URI = "%s://%s:%s@%s:%s/%s" % (
     DATABASE_PORT,
     DATABASE_DB,
 )
+
+RLS_BASE_RELATED_FIELD_FILTERS = {}
 
 # In order to hook up a custom password store for all SQLACHEMY connections
 # implement a function that takes a single argument of type 'sqla.engine.url',
@@ -1217,6 +1219,8 @@ EMAIL_PAGE_RENDER_WAIT = int(timedelta(seconds=30).total_seconds())
 
 # Send user to a link where they can report bugs
 BUG_REPORT_URL = None
+BUG_REPORT_TEXT = "Report a bug"
+BUG_REPORT_ICON = None  # Recommended size: 16x16
 
 # Send user to a link where they can read more about Superset
 DOCUMENTATION_URL = None

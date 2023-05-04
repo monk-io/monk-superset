@@ -107,3 +107,15 @@ foo@bar:~$ monk run superset/stack
 ```bash
 monk purge superset
 ```
+
+
+## Default variables
+
+
+| Variable            | Description                               | Default                                      |
+| ------------------- | ----------------------------------------- | -------------------------------------------- |
+| project_name        | default project name                      | Monk Superset                                |
+| db_user             | Database authorized user password         | monk                                         |
+| db_pass             | Database password that wordpress will use | ook6aroh1Ma9Theim8thieGheiY7aiweenae3eineech |
+| wordpress-image-tag | The domain name you want to run           | latest                                       |
+| mysql-image-tag     | The mysql version you want to use         | latest                                       |
