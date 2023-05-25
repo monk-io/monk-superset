@@ -25,7 +25,7 @@ stack:
       | Variable            | Description                               | Default                                      |
       | ------------------- | ----------------------------------------- | -------------------------------------------- |
       | project_name        | default project name                      | Monk Superset                                |
-    tags: Mathematics, Set theory, Fitness, Exercise, Bodybuilding, Weightlifting, Workout, Database management, Data modeling, Data organization, Information science
+    tags: database management, mathematics, data organization, exercise, fitness, set theory, weightlifting, bodybuilding, workout, data modeling
     website: https://superset.apache.org/
     publisher: monk.io
     icon: https://superset.apache.org/img/superset-logo-horiz.svg
