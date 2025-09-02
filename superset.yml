@@ -113,7 +113,7 @@ rds:
       value: <- $redis_io_threads_do_reads default("yes")
   containers:
     redis:
-      image: bitnami/redis
+      image: bitnamilegacy/redis
       image-tag: <- $redis_image_tag default("latest")
       paths:
         - <- `${monk-volume-path}/superset/redis:/bitnami/redis/data`
