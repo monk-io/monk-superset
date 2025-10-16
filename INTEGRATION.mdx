@@ -1,0 +1,206 @@
+---
+title: Apache Superset
+description: Ready-to-run Apache Superset container template for modern data exploration and business intelligence visualization.
+primary_category: analytics
+tags: [superset, bi, analytics, visualization, template, runnable, dashboard, data-exploration]
+integration_type: template
+hosting_models: [self-hosted]
+website_url: https://superset.apache.org/
+docs_url: https://superset.apache.org/docs/intro
+publisher: monk.io
+---
+
+## Overview
+
+This template provides a production‑ready Apache Superset instance as a Monk runnable. You can:
+
+- Run it directly to get a managed business intelligence and data visualization platform
+- Inherit it in your own data infrastructure to add BI and analytics capabilities
+
+Apache Superset is a modern, enterprise-ready business intelligence web application. It's fast, lightweight, intuitive, and loaded with options that make it easy for users to explore and visualize their data, from simple line charts to highly detailed geospatial charts.
+
+## What this template manages
+
+- Superset web server and workers
+- PostgreSQL or MySQL metadata database
+- Redis for caching and async queries
+- Web UI on port 8088
+- SQL Lab for data exploration
+- Dashboard and chart management
+
+## Quick start (run directly)
+
+1) Load templates
+
+```bash
+monk load MANIFEST
+```
+
+2) Run Superset stack
+
+```bash
+monk run superset/stack
+```
+
+3) Customize credentials (recommended via inheritance)
+
+Running directly uses the defaults defined in this template's `variables`. Secrets added with `monk secrets add` will not affect this runnable unless you inherit it and reference those secrets.
+
+- Preferred: inherit and replace variables with `secret("...")` as shown below.
+- Alternative: fork/clone and edit the `variables` in the template files, then `monk load MANIFEST` and run.
+
+Once started, access Superset at `http://localhost:8088` using the configured credentials (default: `admin` / `admin`).
+
+## Configuration
+
+Key variables you can customize in this template:
+
+```yaml
+variables:
+  # Superset
+  superset-image-tag: "latest"        # container image tag
+  superset-port: "8088"               # web UI port (env: SUPERSET_PORT)
+  superset-admin-username: "admin"    # admin username (env: ADMIN_USERNAME)
+  superset-admin-password: "..."      # admin password (env: ADMIN_PASSWORD)
+  superset-secret-key: "..."          # Flask secret key (env: SECRET_KEY)
+  
+  # Database
+  postgres-password: "..."            # PostgreSQL password (env: POSTGRES_PASSWORD)
+  postgres-user: "superset"           # database user (env: POSTGRES_USER)
+  postgres-db: "superset"             # database name (env: POSTGRES_DB)
+  
+  # Redis
+  redis-password: "..."               # Redis password, optional (env: REDIS_PASSWORD)
+```
+
+Data is persisted under `${monk-volume-path}/superset`, `${monk-volume-path}/postgres`, and `${monk-volume-path}/redis` on the host.
+
+## Use by inheritance (recommended for data platforms)
+
+Inherit the Superset stack in your application and declare a connection. Example:
+
+```yaml
+namespace: myapp
+analytics:
+  defines: runnable
+  inherits: superset/stack
+  variables:
+    superset-admin-password: <- secret("superset-password")
+    superset-secret-key: <- secret("superset-secret")
+    postgres-password: <- secret("postgres-password")
+datawarehouse:
+  defines: runnable
+  containers:
+    dw:
+      image: myorg/datawarehouse
+  connections:
+    bi:
+      runnable: analytics
+      service: superset
+  variables:
+    superset-url:
+      value: <- connection-hostname("bi")
+```
+
+Then set the secrets once and run your app group:
+
+```bash
+monk secrets add -g superset-password="STRONG_PASSWORD"
+monk secrets add -g superset-secret="<random-secret-key>"
+monk secrets add -g postgres-password="STRONG_DB_PASSWORD"
+monk run myapp/analytics
+```
+
+## Ports and connectivity
+
+- Service: `superset` on TCP port `8088`
+- From other runnables in the same process group, use `connection-hostname("<connection-name>")` to resolve the Superset host.
+- From data sources, Superset connects via database drivers (configure in UI)
+
+## Persistence and configuration
+
+- Superset home path: `${monk-volume-path}/superset:/app/superset_home`
+- PostgreSQL data path: `${monk-volume-path}/postgres:/var/lib/postgresql/data`
+- Redis data path: `${monk-volume-path}/redis:/data`
+- You can customize Superset configuration by mounting additional config files into the superset_home directory.
+
+## Features
+
+- **Rich Visualizations**: 40+ chart types (line, bar, pie, maps, etc.)
+- **SQL Lab**: Interactive SQL editor with query history
+- **No-Code Viz Builder**: Create charts without writing code
+- **Dashboards**: Combine multiple charts into interactive dashboards
+- **Database Support**: PostgreSQL, MySQL, SQLite, Redshift, BigQuery, Snowflake, etc.
+- **Caching**: Redis-based caching for fast query results
+- **Security**: Row-level security, LDAP/OAuth integration
+- **Async Queries**: Long-running queries with Celery
+- **Alerting**: Schedule reports and alerts
+
+## Connecting Data Sources
+
+Superset supports many databases:
+- **SQL**: PostgreSQL, MySQL, SQLite, Oracle
+- **Big Data**: Presto, Hive, Spark SQL, Druid
+- **Cloud**: BigQuery, Redshift, Snowflake, Athena
+- **Time-Series**: InfluxDB, Prometheus
+- And 30+ more via SQLAlchemy drivers
+
+Add database in UI: Data → Databases → + Database
+
+## SQL Lab
+
+Interactive SQL editor with:
+- Auto-completion
+- Query history
+- Multiple tabs
+- Query results export
+- Visualization from queries
+
+## Use cases
+
+Superset excels at:
+- Business intelligence dashboards
+- Data exploration and discovery
+- Ad-hoc data analysis
+- Scheduled reporting
+- Self-service analytics
+- Data democratization
+
+## Production Considerations
+
+For production deployments:
+- Use external PostgreSQL or MySQL for metadata
+- Configure Redis for caching and Celery
+- Enable SSL/TLS
+- Set up authentication (OAuth, LDAP)
+- Configure row-level security
+- Set up monitoring and logging
+
+
+## Related templates
+
+- Use `pgadmin/` for web-based database administration
+- Combine with `grafana/` for time-series visualization
+- Integrate with `telegraf/` for metrics collection
+
+## Troubleshooting
+
+- Access Superset UI at `http://localhost:8088`
+- If you changed `superset-admin-password` but the container has existing data, you may need to recreate the admin user inside Superset.
+- Ensure the host volumes are writable by the container user.
+- Check logs:
+
+```bash
+monk logs -l 500 -f superset/superset
+```
+
+- For connection issues to data sources, verify database drivers are installed in the Superset container
+- For slow queries, check Redis cache configuration
+- For large datasets, configure async query execution with Celery workers
+- Monitor PostgreSQL for metadata database performance
+- Initialize database manually (if needed):
+
+```bash
+superset db upgrade
+superset init
+```
